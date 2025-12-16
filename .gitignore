@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.eggs/
+*.egg-info/
+*.egg
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.local
+
+# Build outputs
+build/
+dist/
+.next/
+out/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (local)
+postgres_data/
+redis_data/
+
+# SSL certificates (for production)
+nginx/ssl/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+

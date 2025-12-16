@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fasttrading
+  labels:
+    app.kubernetes.io/name: fasttrading
+    app.kubernetes.io/component: platform
+

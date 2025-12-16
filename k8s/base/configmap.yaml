@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fasttrading-config
+  namespace: fasttrading
+data:
+  # Application
+  LOG_LEVEL: "info"
+  
+  # Database
+  DATABASE_POOL_SIZE: "20"
+  DATABASE_MAX_OVERFLOW: "10"
+  
+  # Redis
+  REDIS_CACHE_TTL: "60"
+  
+  # Trading Engine
+  MATCHING_INTERVAL_US: "100"
+  MAX_ORDERS_PER_SYMBOL: "100000"
+  
+  # Rate Limiting
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_WINDOW: "60"
+  
+  # CORS
+  CORS_ORIGINS: '["https://trading.example.com"]'
+

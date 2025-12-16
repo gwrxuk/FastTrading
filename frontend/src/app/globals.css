@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Unbounded:wght@200..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --terminal-bg: #0a0a0f;
+  --terminal-surface: #12121a;
+  --terminal-elevated: #1a1a24;
+  --terminal-border: #2a2a3a;
+  --bull: #00d4aa;
+  --bear: #ff4757;
+  --accent-primary: #00d4ff;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--terminal-bg);
+  color: #e5e7eb;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--terminal-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terminal-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a4a;
+}
+
+/* Number animations */
+.price-up {
+  animation: flash-green 0.3s ease-out;
+}
+
+.price-down {
+  animation: flash-red 0.3s ease-out;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(42, 42, 58, 0.5);
+}
+
+/* Grid pattern background */
+.grid-pattern {
+  background-image: 
+    linear-gradient(rgba(42, 42, 58, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 42, 58, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #00d4ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Trading card styles */
+.trading-card {
+  @apply bg-terminal-surface border border-terminal-border rounded-lg p-4;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-accent-primary text-terminal-bg font-semibold px-4 py-2 rounded-lg 
+         transition-all duration-200 hover:brightness-110 active:scale-95;
+}
+
+.btn-buy {
+  @apply bg-bull text-terminal-bg font-semibold px-4 py-2 rounded-lg 
+         transition-all duration-200 hover:brightness-110 active:scale-95;
+}
+
+.btn-sell {
+  @apply bg-bear text-white font-semibold px-4 py-2 rounded-lg 
+         transition-all duration-200 hover:brightness-110 active:scale-95;
+}
+
+/* Input styles */
+.input-field {
+  @apply bg-terminal-elevated border border-terminal-border rounded-lg px-3 py-2
+         text-white placeholder-terminal-muted focus:border-accent-primary 
+         focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all;
+}
+
+/* Order book row animations */
+.orderbook-row {
+  position: relative;
+  transition: background-color 0.1s ease;
+}
+
+.orderbook-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  transition: width 0.2s ease;
+}
+
+.orderbook-row.bid::before {
+  background: rgba(0, 212, 170, 0.1);
+}
+
+.orderbook-row.ask::before {
+  left: 0;
+  right: auto;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+/* Tabs */
+.tab-active {
+  @apply border-b-2 border-accent-primary text-accent-primary;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-terminal-elevated animate-pulse rounded;
+}
+
+/* Trading panel glow effect */
+.panel-glow {
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.05);
+}
+

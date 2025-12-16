@@ -1,0 +1,121 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'k8s/**'
+      - '.github/workflows/cd.yaml'
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: fasttrading-production
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name fasttrading-staging --region ${{ env.AWS_REGION }}
+      
+      - name: Deploy to staging
+        run: |
+          kubectl apply -k k8s/overlays/staging
+      
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/matching-engine -n fasttrading --timeout=300s
+          kubectl rollout status deployment/api-gateway -n fasttrading --timeout=300s
+          kubectl rollout status deployment/frontend -n fasttrading --timeout=300s
+      
+      - name: Run smoke tests
+        run: |
+          # Basic health check
+          STAGING_URL="https://staging.trading.example.com"
+          curl -f "$STAGING_URL/health" || exit 1
+          curl -f "$STAGING_URL/api/v1/market/symbols" || exit 1
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+      
+      - name: Deploy to production (Blue/Green)
+        run: |
+          # Apply new version as green deployment
+          kubectl apply -k k8s/overlays/production
+          
+          # Wait for green deployment to be ready
+          kubectl rollout status deployment/matching-engine -n fasttrading --timeout=600s
+          kubectl rollout status deployment/api-gateway -n fasttrading --timeout=600s
+      
+      - name: Health Check
+        run: |
+          sleep 30
+          PROD_URL="https://trading.example.com"
+          for i in {1..5}; do
+            if curl -sf "$PROD_URL/health"; then
+              echo "Health check passed"
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
+      
+      - name: Notify on success
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "✅ Production deployment successful",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*FastTrading Production Deployment*\n✅ Successfully deployed `${{ github.sha }}`"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed, initiating rollback..."
+          kubectl rollout undo deployment/matching-engine -n fasttrading
+          kubectl rollout undo deployment/api-gateway -n fasttrading
+          kubectl rollout undo deployment/frontend -n fasttrading
+

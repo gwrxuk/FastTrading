@@ -1,0 +1,44 @@
+[package]
+name = "exchange-gateway"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../common" }
+
+tokio.workspace = true
+tokio-stream.workspace = true
+axum.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+
+redis.workspace = true
+rdkafka.workspace = true
+
+# Web3/Blockchain
+ethers.workspace = true
+
+tracing.workspace = true
+tracing-subscriber.workspace = true
+metrics.workspace = true
+metrics-exporter-prometheus.workspace = true
+
+uuid.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+config.workspace = true
+dotenvy.workspace = true
+
+dashmap.workspace = true
+
+# HTTP client for CEX APIs
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+
