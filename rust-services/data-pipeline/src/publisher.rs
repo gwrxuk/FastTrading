@@ -18,14 +18,17 @@ pub async fn run_price_publisher(
 ) -> anyhow::Result<()> {
     let mut interval = time::interval(Duration::from_millis(config.publish_interval_ms));
 
-    info!("Price publisher started with {}ms interval", config.publish_interval_ms);
+    info!(
+        "Price publisher started with {}ms interval",
+        config.publish_interval_ms
+    );
 
     loop {
         interval.tick().await;
-        
+
         // Get all market data and publish
         let market_data = aggregator.get_all_market_data();
-        
+
         for data in market_data {
             // Publish to Redis pub/sub
             // This is picked up by WebSocket servers
@@ -63,4 +66,3 @@ async fn ready() -> Json<serde_json::Value> {
         "ready": true
     }))
 }
-

@@ -15,7 +15,7 @@ use tokio::sync::mpsc;
 use tracing::{info, instrument, warn};
 
 use common::{
-    events::{Event, OrderAccepted, OrderUpdated, TradeExecuted, topics},
+    events::{topics, Event, OrderAccepted, OrderUpdated, TradeExecuted},
     Order, OrderStatus, Symbol, Trade, TradingError,
 };
 
@@ -25,21 +25,24 @@ use crate::orderbook::OrderBook;
 /// Order command for the matching engine
 pub enum OrderCommand {
     NewOrder(Order),
-    CancelOrder { order_id: uuid::Uuid, symbol: Symbol },
+    CancelOrder {
+        order_id: uuid::Uuid,
+        symbol: Symbol,
+    },
 }
 
 /// Matching Engine
 pub struct MatchingEngine {
     /// Order books per symbol
     order_books: DashMap<String, Arc<OrderBook>>,
-    
+
     /// Kafka producer for events
     producer: FutureProducer,
-    
+
     /// Command channel
     command_tx: mpsc::Sender<OrderCommand>,
     command_rx: RwLock<Option<mpsc::Receiver<OrderCommand>>>,
-    
+
     /// Supported symbols
     symbols: Vec<Symbol>,
 }
@@ -75,10 +78,9 @@ impl MatchingEngine {
 
         // Initialize order books
         for symbol in symbols {
-            engine.order_books.insert(
-                symbol.to_string(),
-                Arc::new(OrderBook::new(symbol)),
-            );
+            engine
+                .order_books
+                .insert(symbol.to_string(), Arc::new(OrderBook::new(symbol)));
         }
 
         Ok(engine)
@@ -91,7 +93,10 @@ impl MatchingEngine {
 
     /// Run the main matching loop
     pub async fn run_matching_loop(&self) -> Result<()> {
-        let mut rx = self.command_rx.write().take()
+        let mut rx = self
+            .command_rx
+            .write()
+            .take()
             .expect("Matching loop already started");
 
         info!("Starting matching engine loop");
@@ -187,13 +192,20 @@ impl MatchingEngine {
     }
 
     /// Get order book depth
-    pub fn get_depth(&self, symbol: &Symbol, levels: usize) -> Result<(Vec<common::PriceLevel>, Vec<common::PriceLevel>)> {
+    pub fn get_depth(
+        &self,
+        symbol: &Symbol,
+        levels: usize,
+    ) -> Result<(Vec<common::PriceLevel>, Vec<common::PriceLevel>)> {
         let book = self.get_order_book(symbol)?;
         Ok(book.get_depth(levels))
     }
 
     /// Get best bid/offer
-    pub fn get_bbo(&self, symbol: &Symbol) -> Result<(Option<rust_decimal::Decimal>, Option<rust_decimal::Decimal>)> {
+    pub fn get_bbo(
+        &self,
+        symbol: &Symbol,
+    ) -> Result<(Option<rust_decimal::Decimal>, Option<rust_decimal::Decimal>)> {
         let book = self.get_order_book(symbol)?;
         Ok(book.get_bbo())
     }
@@ -216,7 +228,7 @@ impl MatchingEngine {
         );
 
         let payload = serde_json::to_string(&event)?;
-        
+
         self.producer
             .send(
                 FutureRecord::to(topics::ORDERS)
@@ -260,4 +272,3 @@ impl MatchingEngine {
         &self.symbols
     }
 }
-

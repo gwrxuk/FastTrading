@@ -1,22 +1,19 @@
 //! Kafka Consumer for trade events
 
-use std::sync::Arc;
 use anyhow::Result;
 use rdkafka::{
     consumer::{Consumer, StreamConsumer},
     ClientConfig, Message,
 };
+use std::sync::Arc;
 use tokio_stream::StreamExt;
 use tracing::{error, info, warn};
 
-use common::{events::topics, Trade};
 use crate::aggregator::PriceAggregator;
 use crate::config::Config;
+use common::{events::topics, Trade};
 
-pub async fn run_trade_consumer(
-    aggregator: Arc<PriceAggregator>,
-    config: &Config,
-) -> Result<()> {
+pub async fn run_trade_consumer(aggregator: Arc<PriceAggregator>, config: &Config) -> Result<()> {
     let consumer: StreamConsumer = ClientConfig::new()
         .set("bootstrap.servers", &config.kafka_brokers)
         .set("group.id", &config.kafka_group_id)
@@ -34,7 +31,10 @@ pub async fn run_trade_consumer(
         match message {
             Ok(msg) => {
                 if let Some(payload) = msg.payload() {
-                    match serde_json::from_slice::<common::events::Event<common::events::TradeExecuted>>(payload) {
+                    match serde_json::from_slice::<
+                        common::events::Event<common::events::TradeExecuted>,
+                    >(payload)
+                    {
                         Ok(event) => {
                             if let Err(e) = aggregator.process_trade(event.payload.trade).await {
                                 error!("Failed to process trade: {}", e);
@@ -54,4 +54,3 @@ pub async fn run_trade_consumer(
 
     Ok(())
 }
-

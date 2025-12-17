@@ -5,15 +5,15 @@
 //! - DEX integrations (Uniswap, SushiSwap, etc.)
 //! - DeFi protocols (Aave, Compound, etc.)
 
-use std::sync::Arc;
 use anyhow::Result;
+use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod config;
 mod adapters;
-mod router;
 mod api;
+mod config;
+mod router;
 
 use config::Config;
 
@@ -27,7 +27,10 @@ async fn main() -> Result<()> {
         .with(tracing_subscriber::fmt::layer().json())
         .init();
 
-    info!("Starting FastTrading Exchange Gateway v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Starting FastTrading Exchange Gateway v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Initialize exchange adapters
     let exchange_router = Arc::new(router::ExchangeRouter::new(&config).await?);
@@ -37,4 +40,3 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
-

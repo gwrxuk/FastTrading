@@ -26,38 +26,19 @@ pub fn init_metrics(config: &Config) -> Result<()> {
         "Order matching latency in microseconds"
     );
 
-    metrics::describe_counter!(
-        "orders_received",
-        "Total orders received"
-    );
+    metrics::describe_counter!("orders_received", "Total orders received");
 
-    metrics::describe_counter!(
-        "orders_matched",
-        "Total orders matched"
-    );
+    metrics::describe_counter!("orders_matched", "Total orders matched");
 
-    metrics::describe_counter!(
-        "orders_cancelled",
-        "Total orders cancelled"
-    );
+    metrics::describe_counter!("orders_cancelled", "Total orders cancelled");
 
-    metrics::describe_counter!(
-        "trades_executed",
-        "Total trades executed"
-    );
+    metrics::describe_counter!("trades_executed", "Total trades executed");
 
-    metrics::describe_gauge!(
-        "orderbook_depth_bids",
-        "Number of bid levels in order book"
-    );
+    metrics::describe_gauge!("orderbook_depth_bids", "Number of bid levels in order book");
 
-    metrics::describe_gauge!(
-        "orderbook_depth_asks",
-        "Number of ask levels in order book"
-    );
+    metrics::describe_gauge!("orderbook_depth_asks", "Number of ask levels in order book");
 
     tracing::info!("Metrics server started on port {}", config.metrics_port);
 
     Ok(())
 }
-

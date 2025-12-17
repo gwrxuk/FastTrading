@@ -12,10 +12,7 @@ pub enum TradingError {
     OrderNotFound(String),
 
     #[error("Insufficient balance: required {required}, available {available}")]
-    InsufficientBalance {
-        required: String,
-        available: String,
-    },
+    InsufficientBalance { required: String, available: String },
 
     #[error("Invalid order: {0}")]
     InvalidOrder(String),
@@ -142,7 +139,9 @@ impl ServiceError {
     pub fn error_code(&self) -> &'static str {
         match self {
             ServiceError::Trading(TradingError::OrderNotFound(_)) => "ORDER_NOT_FOUND",
-            ServiceError::Trading(TradingError::InsufficientBalance { .. }) => "INSUFFICIENT_BALANCE",
+            ServiceError::Trading(TradingError::InsufficientBalance { .. }) => {
+                "INSUFFICIENT_BALANCE"
+            }
             ServiceError::Trading(TradingError::InvalidOrder(_)) => "INVALID_ORDER",
             ServiceError::Trading(TradingError::RateLimitExceeded) => "RATE_LIMIT_EXCEEDED",
             ServiceError::Trading(_) => "TRADING_ERROR",
@@ -154,4 +153,3 @@ impl ServiceError {
         }
     }
 }
-

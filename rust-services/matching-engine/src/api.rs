@@ -8,20 +8,20 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post, delete},
+    routing::{delete, get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
 use tower_http::{
+    compression::CompressionLayer,
     cors::{Any, CorsLayer},
     trace::TraceLayer,
-    compression::CompressionLayer,
 };
 use uuid::Uuid;
 
-use common::{Order, OrderType, Side, Symbol, TimeInForce, OrderStatus, PriceLevel};
 use crate::config::Config;
 use crate::engine::MatchingEngine;
+use common::{Order, OrderStatus, OrderType, PriceLevel, Side, Symbol, TimeInForce};
 
 type AppState = Arc<MatchingEngine>;
 
@@ -31,18 +31,14 @@ pub async fn run_server(engine: Arc<MatchingEngine>, config: &Config) -> anyhow:
         // Health & Info
         .route("/health", get(health_check))
         .route("/info", get(info))
-        
         // Orders
         .route("/orders", post(submit_order))
         .route("/orders/:order_id", delete(cancel_order))
-        
         // Market Data
         .route("/orderbook/:symbol", get(get_orderbook))
         .route("/symbols", get(get_symbols))
-        
         // State
         .with_state(engine)
-        
         // Middleware
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
@@ -50,7 +46,7 @@ pub async fn run_server(engine: Arc<MatchingEngine>, config: &Config) -> anyhow:
             CorsLayer::new()
                 .allow_origin(Any)
                 .allow_methods(Any)
-                .allow_headers(Any)
+                .allow_headers(Any),
         );
 
     let addr = format!("{}:{}", config.host, config.port);
@@ -154,14 +150,15 @@ async fn submit_order(
     use std::str::FromStr;
 
     // Parse quantity
-    let quantity = Decimal::from_str(&req.quantity)
-        .map_err(|_| ApiError {
-            error: "Invalid quantity".to_string(),
-            code: "INVALID_QUANTITY".to_string(),
-        })?;
+    let quantity = Decimal::from_str(&req.quantity).map_err(|_| ApiError {
+        error: "Invalid quantity".to_string(),
+        code: "INVALID_QUANTITY".to_string(),
+    })?;
 
     // Parse price
-    let price = req.price.as_ref()
+    let price = req
+        .price
+        .as_ref()
         .map(|p| Decimal::from_str(p))
         .transpose()
         .map_err(|_| ApiError {
@@ -190,7 +187,9 @@ async fn submit_order(
     // Create order
     let order = Order {
         id: Uuid::new_v4(),
-        client_order_id: req.client_order_id.unwrap_or_else(|| Uuid::new_v4().to_string()),
+        client_order_id: req
+            .client_order_id
+            .unwrap_or_else(|| Uuid::new_v4().to_string()),
         user_id: req.user_id,
         symbol,
         side: req.side,
@@ -209,10 +208,13 @@ async fn submit_order(
     };
 
     // Submit to engine
-    engine.submit_order(order.clone()).await.map_err(|e| ApiError {
-        error: e.to_string(),
-        code: "SUBMIT_FAILED".to_string(),
-    })?;
+    engine
+        .submit_order(order.clone())
+        .await
+        .map_err(|e| ApiError {
+            error: e.to_string(),
+            code: "SUBMIT_FAILED".to_string(),
+        })?;
 
     Ok(Json(OrderResponse {
         id: order.id,
@@ -238,10 +240,13 @@ async fn cancel_order(
         &params.quote.unwrap_or_else(|| "USDT".to_string()),
     );
 
-    engine.cancel_order(order_id, symbol).await.map_err(|e| ApiError {
-        error: e.to_string(),
-        code: "CANCEL_FAILED".to_string(),
-    })?;
+    engine
+        .cancel_order(order_id, symbol)
+        .await
+        .map_err(|e| ApiError {
+            error: e.to_string(),
+            code: "CANCEL_FAILED".to_string(),
+        })?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -284,4 +289,3 @@ async fn get_orderbook(
 async fn get_symbols(State(engine): State<AppState>) -> Json<Vec<String>> {
     Json(engine.symbols().iter().map(|s| s.to_string()).collect())
 }
-

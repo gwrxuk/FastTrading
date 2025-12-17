@@ -2,18 +2,18 @@
 //!
 //! Consumes orders from Kafka topics and forwards to matching engine
 
-use std::sync::Arc;
 use anyhow::Result;
 use rdkafka::{
     consumer::{Consumer, StreamConsumer},
     ClientConfig, Message,
 };
+use std::sync::Arc;
 use tokio_stream::StreamExt;
 use tracing::{error, info, warn};
 
-use common::{events::topics, Order};
 use crate::config::Config;
 use crate::engine::MatchingEngine;
+use common::{events::topics, Order};
 
 /// Run Kafka consumer
 pub async fn run_consumer(engine: Arc<MatchingEngine>, config: &Config) -> Result<()> {
@@ -52,11 +52,10 @@ pub async fn run_consumer(engine: Arc<MatchingEngine>, config: &Config) -> Resul
 async fn process_message(engine: &MatchingEngine, payload: &[u8]) -> Result<()> {
     // Try to parse as an order
     let order: Order = serde_json::from_slice(payload)?;
-    
+
     info!(order_id = %order.id, "Received order from Kafka");
-    
+
     engine.submit_order(order).await?;
-    
+
     Ok(())
 }
-

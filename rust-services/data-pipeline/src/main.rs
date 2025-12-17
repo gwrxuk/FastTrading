@@ -6,16 +6,16 @@
 //! - Market data distribution
 //! - Position and PnL calculation
 
-use std::sync::Arc;
 use anyhow::Result;
+use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod config;
 mod aggregator;
-mod publisher;
-mod consumer;
 mod cache;
+mod config;
+mod consumer;
+mod publisher;
 
 use config::Config;
 
@@ -30,11 +30,14 @@ async fn main() -> Result<()> {
         .with(tracing_subscriber::fmt::layer().json())
         .init();
 
-    info!("Starting FastTrading Data Pipeline v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Starting FastTrading Data Pipeline v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Initialize Redis cache
     let cache = Arc::new(cache::RedisCache::new(&config.redis_url).await?);
-    
+
     // Initialize price aggregator
     let aggregator = Arc::new(aggregator::PriceAggregator::new(cache.clone()));
 
@@ -67,4 +70,3 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
-

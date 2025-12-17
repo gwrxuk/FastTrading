@@ -15,22 +15,22 @@ use crate::types::{Order, OrderStatus, Side, Symbol, Trade};
 pub struct Event<T> {
     /// Unique event ID
     pub id: Uuid,
-    
+
     /// Event type for routing
     pub event_type: String,
-    
+
     /// Correlation ID for request tracing
     pub correlation_id: Option<Uuid>,
-    
+
     /// Source service
     pub source: String,
-    
+
     /// Event timestamp
     pub timestamp: DateTime<Utc>,
-    
+
     /// Sequence number for ordering
     pub sequence: u64,
-    
+
     /// Event payload
     pub payload: T,
 }
@@ -88,16 +88,16 @@ pub struct OrderUpdated {
     pub client_order_id: String,
     pub symbol: Symbol,
     pub status: OrderStatus,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub filled_quantity: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub remaining_quantity: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str_option")]
     pub avg_fill_price: Option<Decimal>,
-    
+
     pub timestamp: DateTime<Utc>,
 }
 
@@ -135,13 +135,13 @@ pub struct OrderBookUpdate {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceTick {
     pub symbol: Symbol,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub price: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub quantity: Decimal,
-    
+
     pub side: Side,
     pub timestamp: DateTime<Utc>,
 }
@@ -153,16 +153,16 @@ pub struct PriceTick {
 pub struct PositionUpdate {
     pub user_id: Uuid,
     pub symbol: Symbol,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub quantity: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub avg_entry_price: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub unrealized_pnl: Decimal,
-    
+
     pub timestamp: DateTime<Utc>,
 }
 
@@ -207,4 +207,3 @@ pub mod topics {
     pub const ALERTS: &str = "risk.alerts";
     pub const AUDIT: &str = "audit.events";
 }
-

@@ -11,40 +11,40 @@ pub struct Config {
     // Server
     #[serde(default = "default_host")]
     pub host: String,
-    
+
     #[serde(default = "default_port")]
     pub port: u16,
-    
+
     // Logging
     #[serde(default = "default_log_level")]
     pub log_level: String,
-    
+
     // Database
     pub database_url: String,
-    
+
     #[serde(default = "default_pool_size")]
     pub database_pool_size: u32,
-    
+
     // Redis
     pub redis_url: String,
-    
+
     // Kafka
     pub kafka_brokers: String,
-    
+
     #[serde(default = "default_kafka_group")]
     pub kafka_group_id: String,
-    
+
     // Matching Engine
     #[serde(default = "default_matching_interval")]
     pub matching_interval_us: u64,
-    
+
     #[serde(default = "default_max_orders_per_symbol")]
     pub max_orders_per_symbol: usize,
-    
+
     // Observability
     #[serde(default)]
     pub otlp_endpoint: Option<String>,
-    
+
     #[serde(default = "default_metrics_port")]
     pub metrics_port: u16,
 }
@@ -90,4 +90,3 @@ impl Config {
         Ok(config.try_deserialize()?)
     }
 }
-

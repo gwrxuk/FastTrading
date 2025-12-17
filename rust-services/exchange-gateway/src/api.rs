@@ -1,11 +1,11 @@
 //! Exchange Gateway API
 
-use std::sync::Arc;
 use axum::{
     extract::{Path, State},
     routing::get,
     Json, Router,
 };
+use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::config::Config;
@@ -46,10 +46,9 @@ async fn exchange_status(
     Path(name): Path<String>,
 ) -> Json<serde_json::Value> {
     let available = router.is_exchange_available(&name).await;
-    
+
     Json(serde_json::json!({
         "exchange": name,
         "available": available
     }))
 }
-

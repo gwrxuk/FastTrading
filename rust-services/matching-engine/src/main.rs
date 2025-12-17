@@ -10,17 +10,17 @@
 //! - Event sourcing for audit trail
 //! - Kafka for event distribution
 
-use std::sync::Arc;
 use anyhow::Result;
+use std::sync::Arc;
 use tracing::{info, Level};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod api;
 mod config;
 mod engine;
-mod orderbook;
-mod api;
 mod kafka;
 mod metrics;
+mod orderbook;
 
 use config::Config;
 use engine::MatchingEngine;
@@ -34,14 +34,17 @@ async fn main() -> Result<()> {
     // Initialize tracing
     init_tracing(&config)?;
 
-    info!("Starting FastTrading Matching Engine v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Starting FastTrading Matching Engine v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Initialize metrics
     metrics::init_metrics(&config)?;
 
     // Create matching engine
     let engine = Arc::new(MatchingEngine::new(&config).await?);
-    
+
     // Start background workers
     let engine_clone = engine.clone();
     tokio::spawn(async move {
@@ -75,4 +78,3 @@ fn init_tracing(config: &Config) -> Result<()> {
 
     Ok(())
 }
-

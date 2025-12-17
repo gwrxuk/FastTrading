@@ -51,7 +51,8 @@ impl RedisCache {
     pub async fn set_orderbook(&self, symbol: &Symbol, bids: &str, asks: &str) -> Result<()> {
         let key = format!("orderbook:{}", symbol);
         let mut conn = self.conn.clone();
-        conn.hset_multiple(&key, &[("bids", bids), ("asks", asks)]).await?;
+        conn.hset_multiple(&key, &[("bids", bids), ("asks", asks)])
+            .await?;
         conn.expire(&key, 60).await?;
         Ok(())
     }
@@ -64,4 +65,3 @@ impl RedisCache {
         Ok(())
     }
 }
-

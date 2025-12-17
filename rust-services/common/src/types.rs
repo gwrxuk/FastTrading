@@ -87,7 +87,7 @@ pub enum OrderStatus {
 }
 
 /// Core Order structure
-/// 
+///
 /// Designed for high-performance order matching with:
 /// - Nanosecond timestamp precision
 /// - Exact decimal arithmetic
@@ -102,34 +102,34 @@ pub struct Order {
     pub order_type: OrderType,
     pub time_in_force: TimeInForce,
     pub status: OrderStatus,
-    
+
     /// Limit price (None for market orders)
     #[serde(with = "rust_decimal::serde::str_option")]
     pub price: Option<Decimal>,
-    
+
     /// Stop trigger price
     #[serde(with = "rust_decimal::serde::str_option")]
     pub stop_price: Option<Decimal>,
-    
+
     /// Original order quantity
     #[serde(with = "rust_decimal::serde::str")]
     pub quantity: Decimal,
-    
+
     /// Quantity already filled
     #[serde(with = "rust_decimal::serde::str")]
     pub filled_quantity: Decimal,
-    
+
     /// Remaining quantity to fill
     #[serde(with = "rust_decimal::serde::str")]
     pub remaining_quantity: Decimal,
-    
+
     /// Average execution price
     #[serde(with = "rust_decimal::serde::str_option")]
     pub avg_fill_price: Option<Decimal>,
-    
+
     /// Sequence number for FIFO ordering
     pub sequence: u64,
-    
+
     /// Timestamps with nanosecond precision
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -143,12 +143,18 @@ impl Order {
     pub fn is_complete(&self) -> bool {
         matches!(
             self.status,
-            OrderStatus::Filled | OrderStatus::Cancelled | OrderStatus::Rejected | OrderStatus::Expired
+            OrderStatus::Filled
+                | OrderStatus::Cancelled
+                | OrderStatus::Rejected
+                | OrderStatus::Expired
         )
     }
 
     pub fn can_match(&self) -> bool {
-        matches!(self.status, OrderStatus::Open | OrderStatus::PartiallyFilled)
+        matches!(
+            self.status,
+            OrderStatus::Open | OrderStatus::PartiallyFilled
+        )
     }
 }
 
@@ -158,28 +164,28 @@ pub struct Trade {
     pub id: Uuid,
     pub trade_id: u64,
     pub symbol: Symbol,
-    
+
     /// Maker order (was in the book)
     pub maker_order_id: Uuid,
     pub maker_user_id: Uuid,
-    
+
     /// Taker order (incoming order)
     pub taker_order_id: Uuid,
     pub taker_user_id: Uuid,
-    
+
     /// Execution details
     #[serde(with = "rust_decimal::serde::str")]
     pub price: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub quantity: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub quote_quantity: Decimal,
-    
+
     /// Taker side
     pub taker_side: Side,
-    
+
     pub executed_at: DateTime<Utc>,
 }
 
@@ -188,10 +194,10 @@ pub struct Trade {
 pub struct PriceLevel {
     #[serde(with = "rust_decimal::serde::str")]
     pub price: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub quantity: Decimal,
-    
+
     pub order_count: u32,
 }
 
@@ -199,25 +205,25 @@ pub struct PriceLevel {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MarketData {
     pub symbol: Symbol,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub bid: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub ask: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub last: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub volume_24h: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub high_24h: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub low_24h: Decimal,
-    
+
     pub timestamp: DateTime<Utc>,
 }
 
@@ -227,23 +233,22 @@ pub struct Candle {
     pub symbol: Symbol,
     pub interval: String,
     pub open_time: DateTime<Utc>,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub open: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub high: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub low: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub close: Decimal,
-    
+
     #[serde(with = "rust_decimal::serde::str")]
     pub volume: Decimal,
-    
+
     pub close_time: DateTime<Utc>,
     pub trade_count: u32,
 }
-

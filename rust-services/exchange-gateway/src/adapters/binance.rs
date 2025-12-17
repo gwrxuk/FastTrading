@@ -11,8 +11,8 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use tracing::{info, warn};
 
-use common::{ExchangeError, MarketData, Order, Symbol, Trade};
 use super::traits::*;
+use common::{ExchangeError, MarketData, Order, Symbol, Trade};
 
 const BINANCE_API_URL: &str = "https://api.binance.com";
 
@@ -81,13 +81,10 @@ impl BinanceAdapter {
             });
         }
 
-        response
-            .json()
-            .await
-            .map_err(|e| ExchangeError::ApiError {
-                code: -1,
-                message: e.to_string(),
-            })
+        response.json().await.map_err(|e| ExchangeError::ApiError {
+            code: -1,
+            message: e.to_string(),
+        })
     }
 }
 
@@ -348,4 +345,3 @@ impl ExchangeAdapter for BinanceAdapter {
         Ok(vec![])
     }
 }
-

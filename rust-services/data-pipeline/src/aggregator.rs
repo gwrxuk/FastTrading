@@ -7,15 +7,15 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
-use chrono::{DateTime, Utc, Timelike, Duration as ChronoDuration};
+use chrono::{DateTime, Duration as ChronoDuration, Timelike, Utc};
 use dashmap::DashMap;
 use parking_lot::RwLock;
 use rust_decimal::Decimal;
 use tokio::time;
 use tracing::info;
 
-use common::{Candle, MarketData, Symbol, Trade};
 use crate::cache::RedisCache;
+use common::{Candle, MarketData, Symbol, Trade};
 
 /// Real-time price data for a symbol
 #[derive(Debug, Clone)]
@@ -52,7 +52,7 @@ impl SymbolStats {
         self.last_price = trade.price;
         self.volume_24h += trade.quantity;
         self.trade_count_24h += 1;
-        
+
         if trade.price > self.high_24h {
             self.high_24h = trade.price;
         }
@@ -62,7 +62,7 @@ impl SymbolStats {
         if self.open_24h == Decimal::ZERO {
             self.open_24h = trade.price;
         }
-        
+
         self.last_update = trade.executed_at;
     }
 
@@ -131,7 +131,11 @@ impl CandleBuilder {
             open_time: self.open_time,
             open: self.open,
             high: self.high,
-            low: if self.low == Decimal::MAX { self.open } else { self.low },
+            low: if self.low == Decimal::MAX {
+                self.open
+            } else {
+                self.low
+            },
             close: self.close,
             volume: self.volume,
             close_time,
@@ -144,10 +148,10 @@ impl CandleBuilder {
 pub struct PriceAggregator {
     /// Real-time stats per symbol
     stats: DashMap<String, SymbolStats>,
-    
+
     /// Candle builders per symbol per interval
     candles: DashMap<String, HashMap<String, CandleBuilder>>,
-    
+
     /// Redis cache for persistence
     cache: Arc<RedisCache>,
 }
@@ -187,13 +191,11 @@ impl PriceAggregator {
         let symbol_key = trade.symbol.to_string();
         let intervals = vec!["1m", "5m", "15m", "1h", "4h", "1d"];
 
-        let mut candle_map = self.candles
-            .entry(symbol_key)
-            .or_insert_with(HashMap::new);
+        let mut candle_map = self.candles.entry(symbol_key).or_insert_with(HashMap::new);
 
         for interval in intervals {
             let candle_open = get_candle_open_time(trade.executed_at, interval);
-            
+
             let builder = candle_map
                 .entry(interval.to_string())
                 .or_insert_with(|| CandleBuilder::new(trade.symbol.clone(), interval, candle_open));
@@ -210,42 +212,78 @@ impl PriceAggregator {
 
     /// Get current market data for symbol
     pub fn get_market_data(&self, symbol: &Symbol) -> Option<MarketData> {
-        self.stats.get(&symbol.to_string()).map(|s| s.to_market_data())
+        self.stats
+            .get(&symbol.to_string())
+            .map(|s| s.to_market_data())
     }
 
     /// Get all market data
     pub fn get_all_market_data(&self) -> Vec<MarketData> {
-        self.stats.iter().map(|r| r.value().to_market_data()).collect()
+        self.stats
+            .iter()
+            .map(|r| r.value().to_market_data())
+            .collect()
     }
 
     /// Get current candle for symbol and interval
     pub fn get_current_candle(&self, symbol: &Symbol, interval: &str) -> Option<Candle> {
-        self.candles.get(&symbol.to_string()).and_then(|map| {
-            map.get(interval).map(|b| b.to_candle(Utc::now()))
-        })
+        self.candles
+            .get(&symbol.to_string())
+            .and_then(|map| map.get(interval).map(|b| b.to_candle(Utc::now())))
     }
 }
 
 /// Get candle open time for a given timestamp and interval
 fn get_candle_open_time(timestamp: DateTime<Utc>, interval: &str) -> DateTime<Utc> {
     let ts = timestamp;
-    
+
     match interval {
         "1m" => ts.with_second(0).unwrap().with_nanosecond(0).unwrap(),
         "5m" => {
             let minute = (ts.minute() / 5) * 5;
-            ts.with_minute(minute).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap()
+            ts.with_minute(minute)
+                .unwrap()
+                .with_second(0)
+                .unwrap()
+                .with_nanosecond(0)
+                .unwrap()
         }
         "15m" => {
             let minute = (ts.minute() / 15) * 15;
-            ts.with_minute(minute).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap()
+            ts.with_minute(minute)
+                .unwrap()
+                .with_second(0)
+                .unwrap()
+                .with_nanosecond(0)
+                .unwrap()
         }
-        "1h" => ts.with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap(),
+        "1h" => ts
+            .with_minute(0)
+            .unwrap()
+            .with_second(0)
+            .unwrap()
+            .with_nanosecond(0)
+            .unwrap(),
         "4h" => {
             let hour = (ts.hour() / 4) * 4;
-            ts.with_hour(hour).unwrap().with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap()
+            ts.with_hour(hour)
+                .unwrap()
+                .with_minute(0)
+                .unwrap()
+                .with_second(0)
+                .unwrap()
+                .with_nanosecond(0)
+                .unwrap()
         }
-        "1d" => ts.with_hour(0).unwrap().with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap(),
+        "1d" => ts
+            .with_hour(0)
+            .unwrap()
+            .with_minute(0)
+            .unwrap()
+            .with_second(0)
+            .unwrap()
+            .with_nanosecond(0)
+            .unwrap(),
         _ => ts,
     }
 }
@@ -256,11 +294,10 @@ pub async fn run_candle_aggregation(aggregator: Arc<PriceAggregator>) -> anyhow:
 
     loop {
         interval.tick().await;
-        
+
         // Process candle closures
         info!("Running candle aggregation tick");
-        
+
         // TODO: Close and publish completed candles
     }
 }
-

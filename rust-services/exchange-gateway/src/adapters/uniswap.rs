@@ -13,8 +13,8 @@ use rust_decimal::Decimal;
 use std::sync::Arc;
 use tracing::info;
 
-use common::{ExchangeError, MarketData, Order, Symbol, Trade};
 use super::traits::*;
+use common::{ExchangeError, MarketData, Order, Symbol, Trade};
 
 // Uniswap V3 Router address on mainnet
 const UNISWAP_ROUTER: &str = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
@@ -36,11 +36,10 @@ impl UniswapAdapter {
     }
 
     fn parse_address(addr: &str) -> Result<Address, ExchangeError> {
-        addr.parse()
-            .map_err(|_| ExchangeError::ApiError {
-                code: -1,
-                message: format!("Invalid address: {}", addr),
-            })
+        addr.parse().map_err(|_| ExchangeError::ApiError {
+            code: -1,
+            message: format!("Invalid address: {}", addr),
+        })
     }
 }
 
@@ -146,7 +145,7 @@ impl DexAdapter for UniswapAdapter {
 
         // Would build and send swap transaction
         // This requires wallet/signer integration
-        
+
         Err(ExchangeError::UnsupportedOperation(
             "Swap execution requires wallet configuration".to_string(),
         ))
@@ -163,4 +162,3 @@ impl DexAdapter for UniswapAdapter {
         })
     }
 }
-

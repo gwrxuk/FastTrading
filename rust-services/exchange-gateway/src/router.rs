@@ -2,13 +2,13 @@
 //!
 //! Routes orders to appropriate exchanges based on configuration
 
+use anyhow::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
-use anyhow::Result;
 
-use common::{ExchangeError, Symbol};
-use crate::adapters::{ExchangeAdapter, BinanceAdapter, UniswapAdapter};
+use crate::adapters::{BinanceAdapter, ExchangeAdapter, UniswapAdapter};
 use crate::config::Config;
+use common::{ExchangeError, Symbol};
 
 pub struct ExchangeRouter {
     exchanges: HashMap<String, Arc<dyn ExchangeAdapter>>,
@@ -80,4 +80,3 @@ impl ExchangeRouter {
         }
     }
 }
-
