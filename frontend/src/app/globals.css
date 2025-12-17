@@ -148,3 +148,100 @@ body {
   box-shadow: 0 0 60px rgba(0, 212, 255, 0.05);
 }
 
+/* AI Analytics specific styles */
+.ai-gradient {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(6, 182, 212, 0.1));
+}
+
+.ai-border {
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.ai-glow {
+  box-shadow: 0 0 40px rgba(147, 51, 234, 0.1);
+}
+
+/* Risk level indicators */
+.risk-low {
+  @apply text-bull bg-bull/10 border-bull/30;
+}
+
+.risk-medium {
+  @apply text-yellow-500 bg-yellow-500/10 border-yellow-500/30;
+}
+
+.risk-high {
+  @apply text-orange-500 bg-orange-500/10 border-orange-500/30;
+}
+
+.risk-critical {
+  @apply text-bear bg-bear/10 border-bear/30;
+}
+
+/* Pulse animation for alerts */
+@keyframes pulse-alert {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-alert {
+  animation: pulse-alert 2s ease-in-out infinite;
+}
+
+/* Sentiment gauge animation */
+@keyframes sentiment-fill {
+  from {
+    width: 0;
+  }
+}
+
+.sentiment-bar {
+  animation: sentiment-fill 1s ease-out;
+}
+
+/* AI insight card hover effect */
+.insight-card {
+  transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.15);
+}
+
+/* Prediction direction indicators */
+.direction-bullish {
+  @apply text-bull;
+}
+
+.direction-bearish {
+  @apply text-bear;
+}
+
+.direction-neutral {
+  @apply text-terminal-muted;
+}
+
+/* Analytics dashboard scrollbar */
+.analytics-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.analytics-scroll::-webkit-scrollbar-track {
+  background: rgba(42, 42, 58, 0.3);
+  border-radius: 2px;
+}
+
+.analytics-scroll::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.5);
+  border-radius: 2px;
+}
+
+.analytics-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.7);
+}
+

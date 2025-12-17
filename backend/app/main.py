@@ -7,6 +7,8 @@ Features:
 - WebSocket price feeds
 - Web3 wallet integration
 - Rate limiting and security
+- AI-powered analytics and risk management
+- Anomaly detection and market sentiment analysis
 """
 from contextlib import asynccontextmanager
 
@@ -22,6 +24,7 @@ from app.api.router import api_router
 from app.websocket.handlers import websocket_endpoint
 from app.websocket.manager import ws_manager
 from app.services.market import market_service
+from app.services.ai_analytics import ai_analytics_service
 
 
 @asynccontextmanager
@@ -49,7 +52,11 @@ async def lifespan(app: FastAPI):
     await market_service.start(redis_client)
     print("✅ Market data service started")
     
+    # AI Analytics service is ready (stateless)
+    print("✅ AI Analytics service ready")
+    
     print("🎯 FastTrading API ready!")
+    print("🤖 AI-powered features enabled: anomaly detection, risk scoring, predictions")
     
     yield
     
@@ -70,13 +77,22 @@ app = FastAPI(
     description="""
     ## FastTrading API
     
-    High-performance cryptocurrency trading platform API.
+    High-performance cryptocurrency trading platform API with AI-powered analytics.
     
     ### Features
     - **Order Management**: Place, cancel, and track orders
     - **Real-time Data**: WebSocket price feeds and order updates
     - **Wallet Integration**: Web3 wallet binding and transactions
     - **Market Data**: Tickers, candles, and order book depth
+    - **AI Analytics**: Risk scoring, anomaly detection, price predictions
+    - **Portfolio Analysis**: Comprehensive portfolio insights and metrics
+    - **Market Sentiment**: Real-time sentiment analysis
+    
+    ### AI-Powered Features
+    - **Anomaly Detection**: Identify unusual trading patterns, volume spikes, and potential manipulation
+    - **Risk Scoring**: Dynamic risk assessment for users and portfolios
+    - **Price Predictions**: Technical analysis-based price forecasting
+    - **Portfolio Insights**: AI-generated recommendations and performance metrics
     
     ### Authentication
     Most endpoints require JWT authentication. 

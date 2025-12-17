@@ -145,5 +145,39 @@ export const market = {
   symbols: () => api.get("/market/symbols"),
 };
 
+// AI Analytics endpoints
+export const analytics = {
+  // Anomaly detection
+  getAnomalies: (params?: { symbol?: string; lookback_hours?: number; user_only?: boolean }) =>
+    api.get("/analytics/anomalies", { params }),
+  
+  // Risk scoring
+  getUserRiskScore: () => api.get("/analytics/risk/user"),
+  
+  getSpecificUserRiskScore: (userId: string) =>
+    api.get(`/analytics/risk/user/${userId}`),
+  
+  // Price predictions
+  getPricePrediction: (symbol: string, horizonMinutes = 60) =>
+    api.get(`/analytics/predictions/${symbol}`, { params: { horizon_minutes: horizonMinutes } }),
+  
+  // Portfolio analysis
+  getPortfolioAnalysis: () => api.get("/analytics/portfolio"),
+  
+  // Market sentiment
+  getMarketSentiment: (symbol: string) =>
+    api.get(`/analytics/sentiment/${symbol}`),
+  
+  // Summary dashboard
+  getSummary: (symbols: string[] = ["ETH-USDT", "BTC-USDT"]) =>
+    api.get("/analytics/summary", { params: { symbols } }),
+  
+  // AI insights
+  getInsights: () => api.get("/analytics/insights"),
+  
+  // Trading metrics
+  getTradingMetrics: () => api.get("/analytics/metrics"),
+};
+
 export default api;
 

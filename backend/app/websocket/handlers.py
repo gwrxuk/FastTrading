@@ -26,6 +26,10 @@ async def websocket_endpoint(
     - trades:{symbol} - Trade executions
     - orderbook:{symbol} - Order book updates
     - orders - User's order updates (requires auth)
+    - analytics:anomaly - Real-time anomaly alerts (requires auth)
+    - analytics:risk - Risk score updates (requires auth)
+    - analytics:predictions - Price prediction updates
+    - analytics:sentiment - Market sentiment updates
     
     Messages:
     - {"action": "subscribe", "channel": "prices:ETH-USDT"}
@@ -54,17 +58,24 @@ async def websocket_endpoint(
             if action == "subscribe":
                 channel = data.get("channel", "")
                 
-                # Validate channel
-                if channel.startswith("orders") and not user_id:
+                # Validate channel - require auth for sensitive channels
+                auth_required_channels = ["orders", "analytics:anomaly", "analytics:risk"]
+                if any(channel.startswith(ch) for ch in auth_required_channels) and not user_id:
                     await ws_manager.send_personal(connection_id, {
                         "type": "error",
-                        "message": "Authentication required for orders channel"
+                        "message": "Authentication required for this channel"
                     })
                     continue
                 
-                # Subscribe to user-specific orders channel
+                # Subscribe to user-specific channels
                 if channel == "orders" and user_id:
                     channel = f"orders:{user_id}"
+                elif channel == "analytics:risk" and user_id:
+                    channel = f"analytics:risk:{user_id}"
+                elif channel == "analytics:anomaly" and user_id:
+                    # User can see their own anomalies plus global market anomalies
+                    await ws_manager.subscribe(connection_id, f"analytics:anomaly:user:{user_id}")
+                    channel = "analytics:anomaly:market"
                 
                 await ws_manager.subscribe(connection_id, channel)
             
@@ -72,6 +83,11 @@ async def websocket_endpoint(
                 channel = data.get("channel", "")
                 if channel == "orders" and user_id:
                     channel = f"orders:{user_id}"
+                elif channel == "analytics:risk" and user_id:
+                    channel = f"analytics:risk:{user_id}"
+                elif channel == "analytics:anomaly" and user_id:
+                    await ws_manager.unsubscribe(connection_id, f"analytics:anomaly:user:{user_id}")
+                    channel = "analytics:anomaly:market"
                 await ws_manager.unsubscribe(connection_id, channel)
             
             elif action == "ping":
