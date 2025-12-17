@@ -156,12 +156,12 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # Build Docker Images
+  # Build Docker Images (only runs when AWS credentials are configured)
   build-images:
     name: Build Docker Images
     needs: [rust-check, python-check, frontend-check]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_AWS_DEPLOY == 'true'
     permissions:
       id-token: write
       contents: read
