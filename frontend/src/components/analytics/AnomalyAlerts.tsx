@@ -43,7 +43,7 @@ export function AnomalyAlerts({ limit = 10, compact = false }: AnomalyAlertsProp
   useEffect(() => {
     // Simulate API call with mock data
     const timer = setTimeout(() => {
-      setAnomalies([
+      const mockData: Anomaly[] = [
         {
           id: "1",
           type: "volume_spike",
@@ -84,7 +84,8 @@ export function AnomalyAlerts({ limit = 10, compact = false }: AnomalyAlertsProp
           recommendation: "Investigate for potential wash trading or self-dealing",
           metrics: { buy_volume: 125000, sell_volume: 118000, match_ratio: 0.94 },
         },
-      ].slice(0, limit));
+      ];
+      setAnomalies(mockData.slice(0, limit));
       setIsLoading(false);
     }, 600);
 
