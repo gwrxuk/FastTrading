@@ -20,12 +20,15 @@ pub struct Config {
     pub log_level: String,
 
     // Database
+    #[allow(dead_code)]
     pub database_url: String,
 
     #[serde(default = "default_pool_size")]
+    #[allow(dead_code)]
     pub database_pool_size: u32,
 
     // Redis
+    #[allow(dead_code)]
     pub redis_url: String,
 
     // Kafka
@@ -36,13 +39,16 @@ pub struct Config {
 
     // Matching Engine
     #[serde(default = "default_matching_interval")]
+    #[allow(dead_code)]
     pub matching_interval_us: u64,
 
     #[serde(default = "default_max_orders_per_symbol")]
+    #[allow(dead_code)]
     pub max_orders_per_symbol: usize,
 
     // Observability
     #[serde(default)]
+    #[allow(dead_code)]
     pub otlp_endpoint: Option<String>,
 
     #[serde(default = "default_metrics_port")]

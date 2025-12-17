@@ -42,7 +42,8 @@ ethers = { version = "2.0", features = ["rustls", "ws"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tracing-opentelemetry = "0.22"
-opentelemetry = { version = "0.21", features = ["rt-tokio"] }
+opentelemetry = "0.21"
+opentelemetry_sdk = { version = "0.21", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.14", features = ["tonic"] }
 metrics = "0.22"
 metrics-exporter-prometheus = "0.13"

@@ -2,6 +2,8 @@
 //!
 //! Integration with Binance spot trading API
 
+#![allow(dead_code)]
+
 use async_trait::async_trait;
 use chrono::Utc;
 use hmac::{Hmac, Mac};
@@ -9,7 +11,7 @@ use reqwest::Client;
 use rust_decimal::Decimal;
 use sha2::Sha256;
 use std::collections::HashMap;
-use tracing::{info, warn};
+use tracing::info;
 
 use super::traits::*;
 use common::{ExchangeError, MarketData, Order, Symbol, Trade};
@@ -53,16 +55,13 @@ impl BinanceAdapter {
         // Build query string
         let query_string: String = params
             .iter()
-            .map(|(k, v)| format!("{}={}", k, v))
+            .map(|(k, v)| format!("{k}={v}"))
             .collect::<Vec<_>>()
             .join("&");
 
         // Sign
         let signature = self.sign(&query_string);
-        let url = format!(
-            "{}{}?{}&signature={}",
-            BINANCE_API_URL, endpoint, query_string, signature
-        );
+        let url = format!("{BINANCE_API_URL}{endpoint}?{query_string}&signature={signature}",);
 
         let response = self
             .client
@@ -97,7 +96,7 @@ impl ExchangeAdapter for BinanceAdapter {
     async fn is_available(&self) -> bool {
         let result = self
             .client
-            .get(format!("{}/api/v3/ping", BINANCE_API_URL))
+            .get(format!("{BINANCE_API_URL}/api/v3/ping"))
             .send()
             .await;
         result.is_ok()
@@ -121,7 +120,7 @@ impl ExchangeAdapter for BinanceAdapter {
 
         let info: ExchangeInfo = self
             .client
-            .get(format!("{}/api/v3/exchangeInfo", BINANCE_API_URL))
+            .get(format!("{BINANCE_API_URL}/api/v3/exchangeInfo"))
             .send()
             .await
             .map_err(|e| ExchangeError::ConnectionFailed(e.to_string()))?
@@ -163,8 +162,7 @@ impl ExchangeAdapter for BinanceAdapter {
         let ticker: Ticker = self
             .client
             .get(format!(
-                "{}/api/v3/ticker/24hr?symbol={}",
-                BINANCE_API_URL, binance_symbol
+                "{BINANCE_API_URL}/api/v3/ticker/24hr?symbol={binance_symbol}",
             ))
             .send()
             .await
@@ -340,7 +338,7 @@ impl ExchangeAdapter for BinanceAdapter {
         })
     }
 
-    async fn get_trades(&self, symbol: &Symbol, limit: u32) -> ExchangeResult<Vec<Trade>> {
+    async fn get_trades(&self, _symbol: &Symbol, _limit: u32) -> ExchangeResult<Vec<Trade>> {
         // Implementation would fetch recent trades
         Ok(vec![])
     }

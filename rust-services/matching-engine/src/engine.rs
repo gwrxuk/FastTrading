@@ -2,7 +2,6 @@
 //!
 //! Manages multiple order books and coordinates order processing
 
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -15,8 +14,8 @@ use tokio::sync::mpsc;
 use tracing::{info, instrument, warn};
 
 use common::{
-    events::{topics, Event, OrderAccepted, OrderUpdated, TradeExecuted},
-    Order, OrderStatus, Symbol, Trade, TradingError,
+    events::{topics, Event, OrderUpdated, TradeExecuted},
+    Order, Symbol, Trade, TradingError,
 };
 
 use crate::config::Config;
@@ -87,6 +86,7 @@ impl MatchingEngine {
     }
 
     /// Get command sender
+    #[allow(dead_code)]
     pub fn command_sender(&self) -> mpsc::Sender<OrderCommand> {
         self.command_tx.clone()
     }
@@ -202,6 +202,7 @@ impl MatchingEngine {
     }
 
     /// Get best bid/offer
+    #[allow(dead_code)]
     pub fn get_bbo(
         &self,
         symbol: &Symbol,
@@ -237,7 +238,7 @@ impl MatchingEngine {
                 Duration::from_secs(5),
             )
             .await
-            .map_err(|(e, _)| anyhow::anyhow!("Kafka send error: {}", e))?;
+            .map_err(|(e, _)| anyhow::anyhow!("Kafka send error: {e}"))?;
 
         Ok(())
     }
@@ -262,7 +263,7 @@ impl MatchingEngine {
                 Duration::from_secs(5),
             )
             .await
-            .map_err(|(e, _)| anyhow::anyhow!("Kafka send error: {}", e))?;
+            .map_err(|(e, _)| anyhow::anyhow!("Kafka send error: {e}"))?;
 
         Ok(())
     }

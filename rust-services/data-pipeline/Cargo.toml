@@ -33,4 +33,4 @@ config.workspace = true
 dotenvy.workspace = true
 
 dashmap.workspace = true
-
+parking_lot.workspace = true

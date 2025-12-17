@@ -2,13 +2,15 @@
 //!
 //! Routes orders to appropriate exchanges based on configuration
 
+#![allow(dead_code)]
+
 use anyhow::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::adapters::{BinanceAdapter, ExchangeAdapter, UniswapAdapter};
 use crate::config::Config;
-use common::{ExchangeError, Symbol};
+use common::Symbol;
 
 pub struct ExchangeRouter {
     exchanges: HashMap<String, Arc<dyn ExchangeAdapter>>,

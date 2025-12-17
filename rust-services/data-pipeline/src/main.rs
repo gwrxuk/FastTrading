@@ -43,16 +43,18 @@ async fn main() -> Result<()> {
 
     // Start trade consumer
     let agg_clone = aggregator.clone();
+    let config_clone = config.clone();
     tokio::spawn(async move {
-        if let Err(e) = consumer::run_trade_consumer(agg_clone, &config).await {
+        if let Err(e) = consumer::run_trade_consumer(agg_clone, &config_clone).await {
             tracing::error!("Trade consumer error: {}", e);
         }
     });
 
     // Start price publisher
     let agg_clone = aggregator.clone();
+    let config_clone = config.clone();
     tokio::spawn(async move {
-        if let Err(e) = publisher::run_price_publisher(agg_clone, &config).await {
+        if let Err(e) = publisher::run_price_publisher(agg_clone, &config_clone).await {
             tracing::error!("Price publisher error: {}", e);
         }
     });

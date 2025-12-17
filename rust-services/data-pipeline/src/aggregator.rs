@@ -7,9 +7,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
-use chrono::{DateTime, Duration as ChronoDuration, Timelike, Utc};
+use chrono::{DateTime, Timelike, Utc};
 use dashmap::DashMap;
-use parking_lot::RwLock;
 use rust_decimal::Decimal;
 use tokio::time;
 use tracing::info;
@@ -83,7 +82,9 @@ impl SymbolStats {
 /// Candle builder for a specific interval
 #[derive(Debug, Clone)]
 pub struct CandleBuilder {
+    #[allow(dead_code)]
     pub symbol: Symbol,
+    #[allow(dead_code)]
     pub interval: String,
     pub open_time: DateTime<Utc>,
     pub open: Decimal,
@@ -124,6 +125,7 @@ impl CandleBuilder {
         self.trade_count += 1;
     }
 
+    #[allow(dead_code)]
     pub fn to_candle(&self, close_time: DateTime<Utc>) -> Candle {
         Candle {
             symbol: self.symbol.clone(),
@@ -191,7 +193,7 @@ impl PriceAggregator {
         let symbol_key = trade.symbol.to_string();
         let intervals = vec!["1m", "5m", "15m", "1h", "4h", "1d"];
 
-        let mut candle_map = self.candles.entry(symbol_key).or_insert_with(HashMap::new);
+        let mut candle_map = self.candles.entry(symbol_key).or_default();
 
         for interval in intervals {
             let candle_open = get_candle_open_time(trade.executed_at, interval);
@@ -211,6 +213,7 @@ impl PriceAggregator {
     }
 
     /// Get current market data for symbol
+    #[allow(dead_code)]
     pub fn get_market_data(&self, symbol: &Symbol) -> Option<MarketData> {
         self.stats
             .get(&symbol.to_string())
@@ -226,6 +229,7 @@ impl PriceAggregator {
     }
 
     /// Get current candle for symbol and interval
+    #[allow(dead_code)]
     pub fn get_current_candle(&self, symbol: &Symbol, interval: &str) -> Option<Candle> {
         self.candles
             .get(&symbol.to_string())
@@ -289,7 +293,7 @@ fn get_candle_open_time(timestamp: DateTime<Utc>, interval: &str) -> DateTime<Ut
 }
 
 /// Run candle aggregation task
-pub async fn run_candle_aggregation(aggregator: Arc<PriceAggregator>) -> anyhow::Result<()> {
+pub async fn run_candle_aggregation(_aggregator: Arc<PriceAggregator>) -> anyhow::Result<()> {
     let mut interval = time::interval(Duration::from_secs(60));
 
     loop {

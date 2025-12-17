@@ -1,5 +1,7 @@
 //! Exchange Gateway Configuration
 
+#![allow(dead_code)]
+
 use anyhow::Result;
 use serde::Deserialize;
 

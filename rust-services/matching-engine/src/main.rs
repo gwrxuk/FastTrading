@@ -12,7 +12,7 @@
 
 use anyhow::Result;
 use std::sync::Arc;
-use tracing::{info, Level};
+use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod api;
@@ -55,8 +55,9 @@ async fn main() -> Result<()> {
 
     // Start Kafka consumer
     let engine_clone = engine.clone();
+    let config_clone = config.clone();
     tokio::spawn(async move {
-        if let Err(e) = kafka::run_consumer(engine_clone, &config).await {
+        if let Err(e) = kafka::run_consumer(engine_clone, &config_clone).await {
             tracing::error!("Kafka consumer error: {}", e);
         }
     });

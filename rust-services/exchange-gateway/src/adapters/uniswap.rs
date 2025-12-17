@@ -2,12 +2,14 @@
 //!
 //! Integration with Uniswap V3 for on-chain swaps
 
+#![allow(dead_code)]
+
 use async_trait::async_trait;
 use chrono::Utc;
 use ethers::{
     prelude::*,
     providers::{Http, Provider},
-    types::{Address, U256},
+    types::Address,
 };
 use rust_decimal::Decimal;
 use std::sync::Arc;
@@ -38,7 +40,7 @@ impl UniswapAdapter {
     fn parse_address(addr: &str) -> Result<Address, ExchangeError> {
         addr.parse().map_err(|_| ExchangeError::ApiError {
             code: -1,
-            message: format!("Invalid address: {}", addr),
+            message: format!("Invalid address: {addr}"),
         })
     }
 }
@@ -133,7 +135,7 @@ impl DexAdapter for UniswapAdapter {
         token_out: &str,
         amount_in: Decimal,
         min_amount_out: Decimal,
-        deadline: u64,
+        _deadline: u64,
     ) -> ExchangeResult<String> {
         info!(
             token_in = token_in,

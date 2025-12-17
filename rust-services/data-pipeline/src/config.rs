@@ -24,6 +24,7 @@ pub struct Config {
     pub publish_interval_ms: u64,
 
     #[serde(default = "default_candle_intervals")]
+    #[allow(dead_code)]
     pub candle_intervals: Vec<String>,
 }
 

@@ -24,8 +24,10 @@ use common::{Order, OrderStatus, PriceLevel, Side, Symbol, Trade};
 struct OrderEntry {
     order_id: Uuid,
     user_id: Uuid,
+    #[allow(dead_code)]
     price: Decimal,
     remaining_quantity: Decimal,
+    #[allow(dead_code)]
     sequence: u64,
 }
 
@@ -117,6 +119,7 @@ impl OrderBook {
     }
 
     /// Get current book sequence
+    #[allow(dead_code)]
     pub fn book_sequence(&self) -> u64 {
         self.book_sequence.load(Ordering::SeqCst)
     }
@@ -395,6 +398,7 @@ impl OrderBook {
     }
 
     /// Get best bid/ask
+    #[allow(dead_code)]
     pub fn get_bbo(&self) -> (Option<Decimal>, Option<Decimal>) {
         let best_bid = self.bids.read().last_key_value().map(|(&p, _)| p);
         let best_ask = self.asks.read().first_key_value().map(|(&p, _)| p);

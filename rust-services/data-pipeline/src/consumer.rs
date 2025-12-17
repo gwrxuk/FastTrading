@@ -11,7 +11,7 @@ use tracing::{error, info, warn};
 
 use crate::aggregator::PriceAggregator;
 use crate::config::Config;
-use common::{events::topics, Trade};
+use common::events::topics;
 
 pub async fn run_trade_consumer(aggregator: Arc<PriceAggregator>, config: &Config) -> Result<()> {
     let consumer: StreamConsumer = ClientConfig::new()

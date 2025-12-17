@@ -2,9 +2,10 @@
 //!
 //! Defines the interface all exchange adapters must implement
 
+#![allow(dead_code)]
+
 use async_trait::async_trait;
 use rust_decimal::Decimal;
-use uuid::Uuid;
 
 use common::{ExchangeError, MarketData, Order, Symbol, Trade};
 

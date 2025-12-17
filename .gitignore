@@ -21,6 +21,8 @@ dist/
 .next/
 out/
 *.egg-info/
+target/
+rust-services/target/
 
 # IDE
 .vscode/
