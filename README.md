@@ -4,6 +4,7 @@ A production-grade cryptocurrency trading platform demonstrating expertise in:
 
 - **Rust Development** - High-performance matching engine with sub-millisecond latency
 - **Financial Infrastructure** - Real-time order matching, data integrity, and low-latency operations
+- **AI-Powered Analytics** - Anomaly detection, risk scoring, price predictions, and portfolio analysis
 - **Data Pipeline Engineering** - Kafka-based event streaming with Redis caching
 - **System Integration** - CEX/DEX adapters for Binance, Uniswap, and more
 - **Cloud-Native Deployment** - Kubernetes manifests and Terraform IaC for AWS
@@ -116,6 +117,38 @@ terraform apply -var-file=environments/production.tfvars
   - Transaction-safe order execution
   - Immutable trade audit logs
 
+### AI-Powered Analytics
+
+- **Anomaly Detection**
+  - Volume spike identification
+  - Large trade (whale) detection
+  - Rapid trading pattern analysis
+  - Wash trading detection
+  - Market manipulation indicators
+
+- **Risk Management**
+  - Dynamic user risk scoring
+  - Portfolio concentration analysis
+  - Volatility exposure metrics
+  - Real-time risk recommendations
+
+- **Price Predictions**
+  - Technical analysis-based forecasting
+  - Moving average signals (SMA/EMA)
+  - RSI and momentum indicators
+  - Confidence-scored predictions
+
+- **Portfolio Analytics**
+  - Comprehensive position tracking
+  - P&L analysis with metrics
+  - Win rate & Sharpe ratio calculation
+  - AI-generated insights and recommendations
+
+- **Market Sentiment**
+  - Buy/sell pressure analysis
+  - Volume trend detection
+  - Real-time sentiment scoring
+
 ### Web3 Integration
 
 - **Multi-Wallet Support**
@@ -149,6 +182,8 @@ terraform apply -var-file=environments/production.tfvars
   - React Query for data fetching
   - Tailwind CSS for styling
   - Lightweight Charts for trading view
+  - AI Analytics Dashboard with real-time insights
+  - Interactive risk visualization and sentiment gauges
 
 ## 📁 Project Structure
 
@@ -175,8 +210,13 @@ FastTrading/
 ├── backend/                          # Python FastAPI services
 │   ├── app/
 │   │   ├── api/                      # REST endpoints
+│   │   │   └── endpoints/
+│   │   │       └── analytics.py      # AI analytics endpoints
 │   │   ├── models/                   # SQLAlchemy models
-│   │   ├── services/                 # Business logic
+│   │   ├── schemas/
+│   │   │   └── analytics.py          # AI analytics schemas
+│   │   ├── services/
+│   │   │   └── ai_analytics.py       # AI analytics service
 │   │   └── websocket/                # Real-time handlers
 │   ├── migrations/                   # Database migrations
 │   ├── tests/                        # Test suite
@@ -185,8 +225,17 @@ FastTrading/
 ├── frontend/                         # NextJS React frontend
 │   ├── src/
 │   │   ├── app/                      # App router pages
-│   │   ├── components/               # React components
-│   │   ├── hooks/                    # Custom React hooks
+│   │   ├── components/
+│   │   │   ├── analytics/            # AI analytics components
+│   │   │   │   ├── AIAnalyticsDashboard.tsx
+│   │   │   │   ├── RiskScoreCard.tsx
+│   │   │   │   ├── AnomalyAlerts.tsx
+│   │   │   │   ├── PricePredictions.tsx
+│   │   │   │   ├── PortfolioInsights.tsx
+│   │   │   │   └── MarketSentiment.tsx
+│   │   │   └── trading/              # Trading components
+│   │   ├── hooks/
+│   │   │   └── useAnalytics.ts       # Analytics React hooks
 │   │   └── lib/                      # API & WebSocket clients
 │   └── Dockerfile
 │
@@ -247,6 +296,18 @@ GET  /api/v1/wallets/balances      - Get balances
 POST /api/v1/wallets/withdraw      - Create withdrawal
 ```
 
+### AI Analytics
+```
+GET /api/v1/analytics/anomalies           - Detect trading anomalies
+GET /api/v1/analytics/risk/user           - Get user risk score
+GET /api/v1/analytics/predictions/{symbol} - AI price predictions
+GET /api/v1/analytics/portfolio           - Portfolio analysis with insights
+GET /api/v1/analytics/sentiment/{symbol}  - Market sentiment analysis
+GET /api/v1/analytics/summary             - Dashboard summary
+GET /api/v1/analytics/insights            - AI recommendations
+GET /api/v1/analytics/metrics             - Trading performance metrics
+```
+
 ## 🌐 WebSocket Channels
 
 ```javascript
@@ -261,6 +322,14 @@ ws.send(JSON.stringify({ action: 'subscribe', channel: 'trades:ETH-USDT' }));
 
 // Subscribe to your orders (requires auth)
 ws.send(JSON.stringify({ action: 'subscribe', channel: 'orders' }));
+
+// Subscribe to AI analytics (requires auth)
+ws.send(JSON.stringify({ action: 'subscribe', channel: 'analytics:anomaly' }));
+ws.send(JSON.stringify({ action: 'subscribe', channel: 'analytics:risk' }));
+
+// Subscribe to market predictions & sentiment
+ws.send(JSON.stringify({ action: 'subscribe', channel: 'analytics:predictions' }));
+ws.send(JSON.stringify({ action: 'subscribe', channel: 'analytics:sentiment' }));
 ```
 
 ## 🔐 Security Features
@@ -272,6 +341,9 @@ ws.send(JSON.stringify({ action: 'subscribe', channel: 'orders' }));
 - CORS protection
 - SQL injection prevention via parameterized queries
 - XSS protection headers
+- AI-powered anomaly detection for suspicious trading patterns
+- Wash trading and market manipulation detection
+- Real-time risk monitoring and alerts
 
 ## 🛠️ Configuration
 
@@ -298,6 +370,13 @@ Key environment variables:
 - Async database operations with asyncpg
 - Redis caching for hot data
 - ORJSON for fast serialization
+
+### AI Analytics
+- Real-time anomaly detection with statistical analysis
+- Dynamic risk scoring with weighted factors
+- Technical indicator calculations (RSI, SMA, momentum)
+- Portfolio analysis with Sharpe ratio and drawdown metrics
+- Market sentiment analysis from order flow
 
 ### Database (TimescaleDB)
 - Hypertables for time-series data
